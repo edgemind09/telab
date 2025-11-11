@@ -1,0 +1,398 @@
+EXP1
+graph = {}
+visited = []
+queue = []
+
+# Taking graph input from user
+n = int(input("Enter number of nodes: "))
+
+print("\nEnter graph data:")
+for i in range(n):
+    node = input(f"\nEnter node name: ").strip()
+    neighbours = input(f"Enter neighbors of {node} (space separated, press Enter if none): ").strip()
+    if neighbours:
+        graph[node] = neighbours.split()
+    else:
+        graph[node] = []
+
+
+def bfs(visited, graph, node):
+    visited.append(node)
+    queue.append(node)
+
+    while queue:
+        m = queue.pop(0)
+        print(m, end=" ")
+
+        for neighbour in graph[m]:
+            if neighbour not in visited:
+                visited.append(neighbour)
+                queue.append(neighbour)
+
+
+start = input("\nEnter starting node for BFS: ")
+
+print("\nThe breadth first search:")
+bfs(visited, graph, start)
+
+
+
+DFS
+graph = {}
+visited = []
+
+# Taking graph input from user
+n = int(input("Enter number of nodes: "))
+
+print("\nEnter graph data:")
+for i in range(n):
+    node = input("\nEnter node name: ").strip()
+    neighbours = input(f"Enter neighbors of {node} (space separated, press Enter if none): ").strip()
+
+    if neighbours:
+        # Remove accidental self-loops
+        neigh_list = [x for x in neighbours.split() if x != node]
+        graph[node] = neigh_list
+    else:
+        graph[node] = []
+
+
+def dfs(visited, graph, node):
+    if node not in visited:
+        visited.append(node)
+        print(node, end=" ")
+
+        for neighbour in graph[node]:
+            dfs(visited, graph, neighbour)
+
+
+start = input("\nEnter starting node for DFS: ").strip()
+
+print("\nThe depth first search:")
+dfs(visited, graph, start)
+
+
+
+
+
+EXP 2 A Star Algo
+def aStarAlgo(start_node, stop_node):
+    open_set = set([start_node])
+    closed_set = set()
+    g = {}
+    parents = {}
+
+    g[start_node] = 0
+    parents[start_node] = start_node
+
+    while open_set:
+        n = None
+
+        # Choose node with lowest f(n) = g(n) + h(n)
+        for v in open_set:
+            if n is None or g[v] + heuristic[v] < g[n] + heuristic[n]:
+                n = v
+
+        if n is None:
+            print("Path does not exist!")
+            return None
+
+        if n == stop_node:
+            path = []
+            while parents[n] != n:
+                path.append(n)
+                n = parents[n]
+            path.append(start_node)
+            path.reverse()
+            print("Path found:", path)
+            return path
+
+        for (m, weight) in graph[n]:
+            if m not in open_set and m not in closed_set:
+                open_set.add(m)
+                parents[m] = n
+                g[m] = g[n] + weight
+            else:
+                if g[m] > g[n] + weight:
+                    g[m] = g[n] + weight
+                    parents[m] = n
+                    if m in closed_set:
+                        closed_set.remove(m)
+                        open_set.add(m)
+
+        open_set.remove(n)
+        closed_set.add(n)
+
+    print("Path does not exist!")
+    return None
+
+
+# ---------- USER INPUT SECTION ----------
+graph = {}
+heuristic = {}
+
+num_nodes = int(input("Enter number of nodes: "))
+
+print("\nEnter node names:")
+nodes = [input(f"Node {i+1}: ").strip() for i in range(num_nodes)]
+
+print("\nEnter neighbors in this format: neighbor cost (space separated). Example: B 3 C 4")
+for node in nodes:
+    data = input(f"Enter neighbors of {node}: ").strip().split()
+    graph[node] = []
+    for i in range(0, len(data), 2):
+        graph[node].append((data[i], int(data[i+1])))
+
+print("\nEnter heuristic values for each node:")
+for node in nodes:
+    h = int(input(f"Heuristic for {node}: "))
+    heuristic[node] = h
+
+start_node = input("\nEnter start node: ").strip()
+stop_node = input("Enter goal node: ").strip()
+
+print("\nRunning A* Search...\n")
+aStarAlgo(start_node, stop_node)
+
+
+
+
+
+
+
+
+
+
+
+EXP 3 
+N Queens
+print("Enter the number of queens:")
+N = int(input())
+
+# Create a chessboard NxN matrix with all elements set to 0
+board = [[0] * N for _ in range(N)]
+
+def attack(i, j):
+    # Check vertically and horizontally
+    for k in range(N):
+        if board[i][k] == 1 or board[k][j] == 1:
+            return True
+    # Check diagonally
+    for k in range(N):
+        for l in range(N):
+            if (k - l == i - j) or (k + l == i + j):
+                if board[k][l] == 1:
+                    return True
+    return False
+
+def Nqueens(n):
+    if n == 0:
+        return True
+    for i in range(N):
+        for j in range(N):
+            if not attack(i, j) and board[i][j] != 1:
+                board[i][j] = 1
+                if Nqueens(n - 1):
+                    return True
+                board[i][j] = 0
+    return False
+
+Nqueens(N)
+for i in board:
+    print(i)
+
+
+CSP
+def isSafe(graph, color):
+    # Check for every edge
+    for i in range(4):
+        for j in range(i + 1, 4):
+            if graph[i][j] and color[j] == color[i]:
+                return False
+    return True
+
+def graphColoring(graph, m, i, color):
+    if i == 4:
+        if isSafe(graph, color):
+            printSolution(color)
+            return True
+        return False
+
+    # Assign each color from 1 to m
+    for j in range(1, m + 1):
+        color[i] = j
+        if graphColoring(graph, m, i + 1, color):
+            return True
+        color[i] = 0
+    return False
+
+def printSolution(color):
+    print("Solution Exists: Following are the assigned colors:")
+    for i in range(4):
+        print(color[i], end=' ')
+
+# Driver code
+if __name__ == "__main__":
+    # Create following graph and test whether it is 3 colorable
+    # Graph: 0---1
+    #        | \  |
+    #        3---2
+    graph = [
+        [0, 1, 1, 1],
+        [1, 0, 1, 0],
+        [1, 1, 0, 1],
+        [1, 0, 1, 0]
+    ]
+    m = 3  # Number of colors
+    color = [0] * 4  # Initialize all color values as 0
+
+    if not graphColoring(graph, m, 0, color):
+        print("Solution does not exist"
+EXP 4 
+MIN MAX
+MAX, MIN = 1000, -1000
+
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+    # If we reach the leaf node
+    if depth == levels:
+        return values[nodeIndex]
+
+    if maximizingPlayer:
+        best = MIN
+        for i in range(2):  # two children
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+
+            # Alpha Beta Pruning
+            if beta <= alpha:
+                break
+        return best
+
+    else:
+        best = MAX
+        for i in range(2):
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+
+            # Alpha Beta Pruning
+            if beta <= alpha:
+                break
+        return best
+
+
+# ---------------- USER INPUT SECTION ---------------- #
+
+print("Alpha-Beta Pruning Minimax\n")
+
+levels = int(input("Enter depth of game tree (example: 3): "))
+
+num_leaf_nodes = 2 ** levels
+print(f"\nEnter {num_leaf_nodes} leaf node values (space separated):")
+
+values = list(map(int, input().split()))
+
+# If user enters fewer/more values
+while len(values) != num_leaf_nodes:
+    print(f"Please enter exactly {num_leaf_nodes} values!")
+    values = list(map(int, input().split()))
+
+result = minimax(0, 0, True, values, MIN, MAX)
+
+print("\nThe optimal value is:", result)
+
+
+
+EXP 5 
+CHATBOT
+import nltk
+from nltk.chat import Chat
+
+# Reflection dictionary is optional here
+reflection = {}
+
+# Boxing-themed pattern-response pairs
+pairs = [
+    [r'hello|hi|hey', 
+     ['Hey champ! Ready to talk boxing?', 
+      'Hello! Wanna discuss boxing tactics or famous fighters?']],
+
+    [r'how are you', 
+     ["I'm in fighting shape! Ready to go 12 rounds. How can I help you?"]],
+
+    [r'who is your favorite boxer', 
+     ["Hard to pick, but Muhammad Ali’s footwork is legendary. Who is yours?"]],
+
+    [r'tell me about (.*)', 
+     ["%1 is a great topic in boxing. What specifically do you want to know?"]],
+
+    [r'best boxer', 
+     ["Pound-for-pound debates never end! Many say Muhammad Ali, Floyd Mayweather, Mike Tyson, or Manny Pacquiao. Who do *you* think is the best?"]],
+
+    [r'training tips', 
+     ["Train your footwork, keep your guard up, control breathing, and practice combos like jab-cross-hook. Consistency wins fights!"]],
+
+    [r'boxing stance', 
+     ["If you’re right-handed, use an orthodox stance. Left-handed fighters use southpaw. Foot positioning matters more than power!"]],
+
+    [r'hook|jab|uppercut', 
+     ['Ah, the fundamentals! Jab to control distance, hook for power angles, uppercut for close-range strikes. Timing is key.']],
+
+    [r'bye|exit|quit', 
+     ['Keep your hands up! Goodbye, champ 🥊']]
+]
+
+def chat():
+    print("🥊 Welcome to the Boxing Chatbot! Type something to start talking boxing 🥊")
+    chat = Chat(pairs, reflection)
+    chat.converse()
+
+chat()
+
+
+
+
+
+
+
+
+EXP 6
+Prims
+INF = 9999999
+
+# Take number of vertices from user
+N = int(input("Enter number of vertices: "))
+
+print("\nEnter the adjacency matrix row by row (use 0 if no edge):")
+
+# Input graph
+G = []
+for i in range(N):
+    row = list(map(int, input(f"Row {i+1}: ").split()))
+    G.append(row)
+
+selected_node = [False] * N
+no_edge = 0
+
+# Select the first node initially
+selected_node[0] = True
+
+print("\nEdge : Weight")
+while no_edge < N - 1:
+    minimum = INF
+    a = -1
+    b = -1
+
+    for m in range(N):
+        if selected_node[m]:
+            for n in range(N):
+                if (not selected_node[n]) and G[m][n] != 0:
+                    if G[m][n] < minimum:
+                        minimum = G[m][n]
+                        a = m
+                        b = n
+
+    print(f"{a} - {b} : {G[a][b]}")
+    selected_node[b] = True
+    no_edge += 1
