@@ -1,0 +1,415 @@
+EXP 1 ---- DATABASE AND TABLE CREATION
+-- 1. Create Database
+CREATE DATABASE college;
+
+USE college;
+
+-- 2. Create STUDENTS Table
+CREATE TABLE STUDENTS (
+  ID INT PRIMARY KEY,
+  NAME VARCHAR(10),
+  CLASSDIV VARCHAR(2),
+  AGE INT
+);
+
+-- 3. Insert Records into STUDENTS
+INSERT INTO STUDENTS (ID, NAME, CLASSDIV, AGE) VALUES
+  (201, 'RAVISH', 'X', 22),
+  (202, 'TEJAS', 'Y', 24),
+  (203, 'ISHA', 'Z', 20),
+  (204, 'KANISHK', 'W', 23),
+  (205, 'TARA', 'V', 25);
+
+-- 4. Select All Records
+SELECT * FROM STUDENTS;
+
+-- 5. Select NAME and AGE
+SELECT NAME, AGE FROM STUDENTS;
+
+-- 6. Update NAME for ID 204 to 'MIRA'
+UPDATE STUDENTS SET NAME = 'MIRA' WHERE ID = 204;
+
+-- 7. Verify Update
+SELECT * FROM STUDENTS;
+
+-- 8. Order Results
+SELECT NAME, AGE FROM STUDENTS ORDER BY AGE ASC;
+SELECT * FROM STUDENTS ORDER BY NAME DESC;
+
+-- 9. Filtering Queries
+SELECT * FROM STUDENTS WHERE ID > 202;
+SELECT * FROM STUDENTS WHERE AGE < 23;
+SELECT * FROM STUDENTS WHERE AGE = 20;
+SELECT * FROM STUDENTS WHERE ID >= 204;
+SELECT * FROM STUDENTS WHERE AGE <= 24;
+SELECT * FROM STUDENTS WHERE ID > 202 AND NAME = 'TARA';
+SELECT * FROM STUDENTS WHERE ID > 202 OR AGE > 25;
+SELECT * FROM STUDENTS WHERE NAME != 'TARA';
+
+-- 10. Select Distinct Names
+SELECT DISTINCT NAME FROM STUDENTS;
+
+-- 11. Select Names Starting with 'T'
+SELECT * FROM STUDENTS WHERE NAME LIKE 'T%';
+
+-- 12. Create COURSES Table
+CREATE TABLE COURSES (
+  ID INT PRIMARY KEY,
+  COURSENAME VARCHAR(10),
+  DEPT VARCHAR(10)
+);
+
+-- 13. Insert Records into COURSES
+INSERT INTO COURSES (ID, COURSENAME, DEPT) VALUES
+  (201, 'JAVA', 'CS'),
+  (202, 'MATH', 'SCI'),
+  (203, 'ART', 'HUM'),
+  (204, 'ROBOTICS', 'ENG');
+
+-- 14. Select All Records from COURSES
+SELECT * FROM COURSES;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EXP 2 – JOIN UNJOIN AND VIEW QUERRIES
+-- 1. Union Query: Select ID and Name/CourseName from STUDENTS and COURSES
+SELECT ID, NAME FROM STUDENTS
+UNION
+SELECT ID, COURSENAME FROM COURSES;
+
+-- 2. Union Query: Select ID, Name/ClassDiv or CourseName/Dept
+SELECT ID, NAME, CLASSDIV FROM STUDENTS
+UNION
+SELECT ID, COURSENAME, DEPT FROM COURSES;
+
+-- 3. Inner Join Query: Join STUDENTS and COURSES on ID
+SELECT * FROM STUDENTS
+INNER JOIN COURSES AS C ON STUDENTS.ID = C.ID;
+
+-- 4. Select All Records from STUDENTS
+SELECT * FROM STUDENTS;
+
+-- 5. Select All Records from COURSES
+SELECT * FROM COURSES;
+
+-- 6. Create View: view_enroll selects ID, NAME, AGE from STUDENTS
+CREATE VIEW view_enroll AS
+SELECT ID, NAME, AGE FROM STUDENTS;
+
+-- 7. Select All Records from View
+SELECT * FROM view_enroll;
+
+EXP 3 – MONGODB
+// Sample Document structure in 'students' collection:
+/*
+{
+  "_id": ObjectId("64..."),
+  "name": "Varad Bhanap",
+  "age": 20,
+  "department": "AIDS",
+  "marks": 82,
+  "active": true
+}
+*/
+
+// 1. Create Operation
+
+// a) Insert one document
+db.students.insertOne({
+  name: "Siddesh Thorat",
+  age: 20,
+  department: "CS",
+  marks: 76,
+  active: true
+});
+
+// b) Insert multiple documents
+db.students.insertMany([
+  { name: "Omkar", age: 21, department: "IT", marks: 68, active: true },
+  { name: "Durvesh", age: 23, department: "Civil", marks: 74, active: false }
+]);
+
+// 2. Read Operation
+
+// a) Display all documents
+db.students.find();
+
+// b) Find documents with condition (department is Computer Science)
+db.students.find({ department: "Computer Science" });
+
+// 3. Update Operation
+
+// a) Update the marks of student named Omkar
+db.students.updateOne(
+  { name: "Omakr" },
+  { $set: { marks: 75 } }
+);
+
+// b) Make all inactive students active
+db.students.updateMany(
+  { active: false },
+  { $set: { active: true } }
+);
+
+// c) Replace entire document of Sneha
+db.students.replaceOne(
+  { name: "Durvesh" },
+  {
+    name: "Durvesh Bhuse",
+    age: 23,
+    department: "Civil",
+    marks: 80,
+    active: true
+  }
+);
+
+// 4. Delete Operation
+
+// a) Delete one record where name = Omkar
+db.students.deleteOne({ name: "Omkar" });
+
+// b) Delete multiple documents where marks are less than 70
+db.students.deleteMany({ marks: { $lt: 70 } });
+
+// 5. Save Method (Deprecated in modern MongoDB)
+
+// Save document by _id, insert if not exists, update if exists
+db.students.save({
+  _id: ObjectId("64d5a1f2abc1234567890abc"),
+  name: "Ravi Kumar",
+  age: 22,
+  department: "Computer Science",
+  marks: 90,
+  active: true
+});
+
+// 6. Logical Operators
+
+// a) $and - Find IT students scoring more than 70
+db.students.find({
+  $and: [{ department: "IT" }, { marks: { $gt: 70 } }]
+});
+
+// b) $or - Find students from IT or Civil department
+db.students.find({
+  $or: [{ department: "IT" }, { department: "Civil" }]
+});
+
+// c) $not - Find students who did NOT score more than 80
+db.students.find({
+  marks: { $not: { $gt: 80 } }
+});
+
+// d) $nor - Find students who are not from IT and not active
+db.students.find({
+  $nor: [{ department: "IT" }, { active: true }]
+});
+
+
+
+
+
+
+
+EXP 4 
+-- 1. Create Tables
+
+CREATE TABLE IF NOT EXISTS Book_Borrowers (
+  Student_ID INT,
+  Student_Name VARCHAR(100),
+  Issue_Date DATE,
+  Book_Title VARCHAR(100),
+  Status CHAR(1),  -- 'I' = issued, 'R' = returned
+  PRIMARY KEY (Student_ID, Book_Title)
+);
+
+CREATE TABLE IF NOT EXISTS Book_Fines (
+  Student_ID INT,
+  Fine_Date DATE,
+  Fine_Amount DECIMAL(10,2)
+);
+
+-- 2. Insert Sample Data
+
+INSERT INTO Book_Borrowers (Student_ID, Student_Name, Issue_Date, Book_Title, Status) VALUES
+  (201, 'Nina', '2025-07-10', 'Data Mining', 'I'),
+  (202, 'Rohan', '2025-08-12', 'Operating Systems', 'I'),
+  (203, 'Anjali', '2025-08-25', 'Computer Networks', 'I');
+
+-- 3. Stored Procedure to Process Book Return and Calculate Fine
+
+DELIMITER $$
+
+CREATE PROCEDURE HandleReturn(
+  IN input_Student_ID INT,
+  IN input_Book_Title VARCHAR(100)
+)
+BEGIN
+  DECLARE v_IssueDate DATE;
+  DECLARE v_DaysLate INT;
+  DECLARE v_Fine DECIMAL(10,2) DEFAULT 0;
+  
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    SELECT 'Error occurred. Check inputs or system state.' AS ErrorMessage;
+  END;
+  
+  START TRANSACTION;
+  
+  -- Get Issue Date for issued book
+  SELECT Issue_Date INTO v_IssueDate
+  FROM Book_Borrowers
+  WHERE Student_ID = input_Student_ID
+    AND Book_Title = input_Book_Title
+    AND Status = 'I'
+  FOR UPDATE;
+  
+  IF v_IssueDate IS NULL THEN
+    ROLLBACK;
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No active issue found for this Student and Book';
+  END IF;
+  
+  -- Calculate days late based on return date = current date
+  SET v_DaysLate = DATEDIFF(CURRENT_DATE, v_IssueDate) - 14;  -- 14 days allowed
+  
+  IF v_DaysLate > 0 THEN
+    SET v_Fine = v_DaysLate * 5;  -- 5 currency units per late day
+    
+    -- Insert into fines table
+    INSERT INTO Book_Fines (Student_ID, Fine_Date, Fine_Amount)
+    VALUES (input_Student_ID, CURRENT_DATE, v_Fine);
+  END IF;
+  
+  -- Update book status as returned
+  UPDATE Book_Borrowers
+  SET Status = 'R'
+  WHERE Student_ID = input_Student_ID
+    AND Book_Title = input_Book_Title;
+  
+  COMMIT;
+  
+  SELECT CONCAT('Return processed. Fine: ', v_Fine) AS Result;
+END$$
+
+DELIMITER ;
+EXP 5
+-- Create Old and New Roll Call Tables
+
+CREATE TABLE Old_Roll_Call (
+  Roll_Number INT PRIMARY KEY,
+  Student_Name VARCHAR(100)
+);
+
+CREATE TABLE New_Roll_Call (
+  Roll_Number INT,
+  Student_Name VARCHAR(100)
+);
+
+-- Insert sample data into old roll call (existing records)
+INSERT INTO Old_Roll_Call VALUES (301, 'Emily');
+
+-- Insert sample data into new roll call (some duplicates, some new)
+INSERT INTO New_Roll_Call VALUES (301, 'Emily'); -- duplicate
+INSERT INTO New_Roll_Call VALUES (302, 'David'); -- new
+INSERT INTO New_Roll_Call VALUES (303, 'Sophia'); -- new
+
+DELIMITER $$
+
+CREATE PROCEDURE Merge_Roll_Calls()
+BEGIN
+  DECLARE v_RollNo INT;
+  DECLARE v_Name VARCHAR(100);
+  DECLARE v_Exists INT;
+  DECLARE done INT DEFAULT 0;
+  
+  DECLARE cur CURSOR FOR SELECT Roll_Number, Student_Name FROM New_Roll_Call;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+  
+  OPEN cur;
+  
+  read_loop: LOOP
+    FETCH cur INTO v_RollNo, v_Name;
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+    
+    -- Check if roll number exists in old roll call
+    SELECT COUNT(*) INTO v_Exists FROM Old_Roll_Call WHERE Roll_Number = v_RollNo;
+    
+    IF v_Exists = 0 THEN
+      INSERT INTO Old_Roll_Call (Roll_Number, Student_Name) VALUES (v_RollNo, v_Name);
+      SELECT CONCAT('Inserted: ', v_RollNo, ' - ', v_Name) AS Message;
+    ELSE
+      SELECT CONCAT('Skipped (Duplicate): ', v_RollNo) AS Message;
+    END IF;
+  END LOOP;
+  
+  CLOSE cur;
+END$$
+
+DELIMITER ;
+
+-- To execute the merge:
+-- CALL Merge_Roll_Calls();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EXP 6
+-- Define the New and Old Roll Call Tables
+
+CREATE TABLE New_Roll_Call (
+  Roll_Number NUMBER NOT NULL,
+  Student_Name VARCHAR2(100),
+  Class VARCHAR2(50)
+);
+
+CREATE TABLE Old_Roll_Call (
+  Roll_Number NUMBER NOT NULL PRIMARY KEY,
+  Student_Name VARCHAR2(100),
+  Class VARCHAR2(50)
+);
+
+-- Insert sample records into New_Roll_Call
+INSERT INTO New_Roll_Call VALUES (1, 'Arjun Patel', 'A');
+INSERT INTO New_Roll_Call VALUES (2, 'Nisha Kulkarni', 'A');
+INSERT INTO New_Roll_Call VALUES (3, 'Karan Mehta', 'B');
+INSERT INTO New_Roll_Call VALUES (4, 'Riya Sharma', 'C');
+
+-- Insert sample records into Old_Roll_Call
+INSERT INTO Old_Roll_Call VALUES (5, 'John Mac', 'C');
+INSERT INTO Old_Roll_Call VALUES (2, 'Salman Khan', 'A');
+INSERT INTO Old_Roll_Call VALUES (6, 'Hari Om', 'B');
